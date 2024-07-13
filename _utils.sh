@@ -4,6 +4,7 @@ telegram_send_message() {
   # use environment variables
   local token=$TG_TOKEN
   local chat=$TG_CHAT
+  local chat2=$TG_CHAT2
   local message=$1 
   local disable_web_page_preview=$2
 
@@ -22,12 +23,22 @@ telegram_send_message() {
   else
     echo "Error sending message to Telegram."
   fi
+
+  local send_message_response2=$(curl -s "https://api.telegram.org/bot$token/sendMessage" -d chat_id="$chat2" -d text="$message" -d parse_mode=MARKDOWN -d disable_web_page_preview="$disable_web_page_preview")
+  if [ "$(echo "$send_message_response2" | jq -r '.ok')" == "true" ]; then
+    echo "Message sent to Telegram."
+  else
+    echo "Error sending message to Telegram."
+  fi
 }
+
+
 
 telegram_send_file() {
   # use environment variables
   local token=$TG_TOKEN
   local chat=$TG_CHAT
+  local chat2=$TG_CHAT
   local file=$1
   local caption=$2
 
@@ -42,6 +53,13 @@ telegram_send_file() {
 
   local send_file_response=$(curl -s "https://api.telegram.org/bot$token/sendDocument" -F chat_id="$chat" -F document=@"$file" -F caption="$caption")
   if [ "$(echo "$send_file_response" | jq -r '.ok')" == "true" ]; then
+    echo "File $file sent to Telegram."
+  else
+    echo "Error sending file $file to Telegram."
+  fi
+
+  local send_file_response2=$(curl -s "https://api.telegram.org/bot$token/sendDocument" -F chat_id="$chat2" -F document=@"$file" -F caption="$caption")
+  if [ "$(echo "$send_file_response2" | jq -r '.ok')" == "true" ]; then
     echo "File $file sent to Telegram."
   else
     echo "Error sending file $file to Telegram."
